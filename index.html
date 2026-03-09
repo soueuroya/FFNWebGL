@@ -114,17 +114,32 @@
       // config.devicePixelRatio = 1;
 
       // Force Fullscreen and Landscape orientation on first interaction
-      document.addEventListener('touchstart', function enableFullscreen() {
+      var enableFullscreen = function () {
         var docElm = document.documentElement;
-        if (docElm.requestFullscreen) {
-          docElm.requestFullscreen().then(() => {
-            if (screen.orientation && screen.orientation.lock) {
-              screen.orientation.lock('landscape').catch(err => console.log('Orientation lock error:', err));
+        var requestFS = docElm.requestFullscreen || docElm.mozRequestFullScreen || docElm.webkitRequestFullscreen || docElm.msRequestFullscreen;
+        if (requestFS) {
+          try {
+            var promise = requestFS.call(docElm);
+            if (promise && promise.then) {
+              promise.then(function () {
+                if (screen.orientation && screen.orientation.lock) {
+                  screen.orientation.lock('landscape').catch(function () { });
+                }
+              }).catch(function () { });
+            } else {
+              if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(function () { });
+              }
             }
-          }).catch(err => console.log('Fullscreen error:', err));
+          } catch (e) { }
         }
-        document.removeEventListener('touchstart', enableFullscreen);
-      }, { once: true });
+        document.removeEventListener('touchstart', enableFullscreen, true);
+        document.removeEventListener('mousedown', enableFullscreen, true);
+        document.removeEventListener('click', enableFullscreen, true);
+      };
+      document.addEventListener('touchstart', enableFullscreen, true);
+      document.addEventListener('mousedown', enableFullscreen, true);
+      document.addEventListener('click', enableFullscreen, true);
 
     } else {
       // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
