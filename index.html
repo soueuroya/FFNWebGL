@@ -5,91 +5,392 @@
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
   <title>FlipFrameNinjas</title>
+
   <link rel="shortcut icon" href="TemplateData/favicon.ico">
   <link rel="stylesheet" href="TemplateData/style.css">
+
+  <style>
+    /* =========================================================
+       PAGE / VIEWPORT
+       ========================================================= */
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    body {
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+
+
+    /* =========================================================
+       UNITY CONTAINER
+       ========================================================= */
+
+    #unity-container {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+
+      width: 100vw !important;
+      height: 100vh !important;
+
+      margin: 0 !important;
+      padding: 0 !important;
+
+      overflow: hidden !important;
+    }
+
+    #unity-canvas {
+      display: block;
+
+      width: 100% !important;
+      height: 100% !important;
+
+      margin: 0;
+      padding: 0;
+    }
+
+
+    /* =========================================================
+       LOADING OVERLAY
+       ========================================================= */
+
+    #loading-cover {
+      position: fixed !important;
+
+      top: 0 !important;
+      left: 0 !important;
+
+      width: 100vw !important;
+      height: 100vh !important;
+
+      margin: 0 !important;
+      padding: 0 !important;
+
+      z-index: 9999 !important;
+
+      pointer-events: none;
+    }
+
+
+    /* =========================================================
+       LOADING BAR CONTAINER
+       ========================================================= */
+
+    #unity-loading-bar {
+      position: fixed !important;
+
+      left: 50% !important;
+      bottom: 20px !important;
+
+      transform: translateX(-50%) !important;
+
+      width: min(80vw, 600px) !important;
+
+      margin: 0 !important;
+      padding: 0 !important;
+
+      z-index: 10000 !important;
+    }
+
+
+    /* =========================================================
+       LOADING PROGRESS BAR
+       ========================================================= */
+
+    #unity-progress-bar-empty {
+      position: relative !important;
+
+      width: 100% !important;
+      height: 10px !important;
+
+      margin: 0 !important;
+      padding: 0 !important;
+
+      z-index: 10001 !important;
+
+      overflow: hidden;
+    }
+
+    #unity-progress-bar-full {
+      position: absolute !important;
+
+      top: 0 !important;
+      left: 0 !important;
+
+      height: 100% !important;
+
+      margin: 0 !important;
+      padding: 0 !important;
+
+      z-index: 10002 !important;
+    }
+
+
+    /* =========================================================
+       LOGO / SPINNER
+       ========================================================= */
+
+    #unity-logo {
+      position: relative;
+
+      z-index: 10000;
+    }
+
+    .spinner {
+      position: relative;
+
+      z-index: 10000;
+    }
+
+
+    /* =========================================================
+       FULLSCREEN BUTTON
+       ========================================================= */
+
+    #unity-fullscreen-button {
+      position: fixed !important;
+
+      z-index: 10000 !important;
+    }
+  </style>
 </head>
 
+
 <body class="dark">
+
+  <!-- =======================================================
+       UNITY GAME
+       ======================================================== -->
+
   <div id="unity-container" class="unity-desktop">
     <canvas id="unity-canvas"></canvas>
   </div>
+
+
+  <!-- =======================================================
+       LOADING SCREEN
+       ======================================================== -->
+
   <div id="loading-cover" style="display:none;">
+
     <div id="unity-loading-bar">
-      <div id="unity-logo"><img src="logo.png"></div>
-      <div id="unity-progress-bar-empty" style="display: none; position: relative; z-index: 99;">
+
+      <div id="unity-logo">
+        <img src="logo.png">
+      </div>
+
+      <div id="unity-progress-bar-empty">
         <div id="unity-progress-bar-full"></div>
       </div>
+
       <div class="spinner"></div>
+
     </div>
+
   </div>
+
+
+  <!-- =======================================================
+       FULLSCREEN BUTTON
+       ======================================================== -->
+
   <div id="unity-fullscreen-button" style="display: none;"></div>
+
+
+  <!-- =======================================================
+       UNITY INITIALIZATION
+       ======================================================== -->
+
   <script>
+
     const hideFullScreenButton = "1";
+
     const buildUrl = "Build";
-    const loaderUrl = buildUrl + "/6708c42e2bfb673ccdd36829f46251c1.loader.js";
+
+    const loaderUrl =
+      buildUrl + "/6708c42e2bfb673ccdd36829f46251c1.loader.js";
+
+
     const config = {
-      dataUrl: buildUrl + "/c5d1bddd73585b506f1fb21d3f99ceea.data",
-      frameworkUrl: buildUrl + "/463e6b2d3ae3adb758613fa0d11f1ad9.framework.js",
-      codeUrl: buildUrl + "/864f6c2be4d5777e0e175b9cc1612d2b.wasm",
-        streamingAssetsUrl: "StreamingAssets",
+
+      dataUrl:
+        buildUrl + "/c5d1bddd73585b506f1fb21d3f99ceea.data",
+
+      frameworkUrl:
+        buildUrl + "/463e6b2d3ae3adb758613fa0d11f1ad9.framework.js",
+
+      codeUrl:
+        buildUrl + "/864f6c2be4d5777e0e175b9cc1612d2b.wasm",
+
+      streamingAssetsUrl: "StreamingAssets",
+
       companyName: "AnimeUniverse",
+
       productName: "FlipFrameNinjas",
+
       productVersion: "0.1.0",
     };
 
-    const container = document.querySelector("#unity-container");
-    const canvas = document.querySelector("#unity-canvas");
-    const loadingCover = document.querySelector("#loading-cover");
-    const progressBarEmpty = document.querySelector("#unity-progress-bar-empty");
-    const progressBarFull = document.querySelector("#unity-progress-bar-full");
-    const fullscreenButton = document.querySelector("#unity-fullscreen-button");
-    const spinner = document.querySelector('.spinner');
+
+    /* =======================================================
+       DOM REFERENCES
+       ======================================================== */
+
+    const container =
+      document.querySelector("#unity-container");
+
+    const canvas =
+      document.querySelector("#unity-canvas");
+
+    const loadingCover =
+      document.querySelector("#loading-cover");
+
+    const progressBarEmpty =
+      document.querySelector("#unity-progress-bar-empty");
+
+    const progressBarFull =
+      document.querySelector("#unity-progress-bar-full");
+
+    const fullscreenButton =
+      document.querySelector("#unity-fullscreen-button");
+
+    const spinner =
+      document.querySelector(".spinner");
+
+
+    /* =======================================================
+       FULLSCREEN SUPPORT
+       ======================================================== */
 
     const canFullscreen = (function () {
+
       for (const key of [
-        'exitFullscreen',
-        'webkitExitFullscreen',
-        'webkitCancelFullScreen',
-        'mozCancelFullScreen',
-        'msExitFullscreen',
+
+        "exitFullscreen",
+        "webkitExitFullscreen",
+        "webkitCancelFullScreen",
+        "mozCancelFullScreen",
+        "msExitFullscreen",
+
       ]) {
+
         if (key in document) {
           return true;
         }
+
       }
+
       return false;
+
     }());
 
-    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+
+    /* =======================================================
+       MOBILE SETTINGS
+       ======================================================== */
+
+    if (
+      /iPhone|iPad|iPod|Android/i.test(
+        navigator.userAgent
+      )
+    ) {
+
       container.className = "unity-mobile";
+
       config.devicePixelRatio = 1;
+
     }
+
+
+    /* =======================================================
+       SHOW LOADING SCREEN
+       ======================================================== */
+
     loadingCover.style.display = "";
 
-    const script = document.createElement("script");
+
+    /* =======================================================
+       LOAD UNITY
+       ======================================================== */
+
+    const script =
+      document.createElement("script");
+
     script.src = loaderUrl;
+
+
     script.onload = () => {
-      createUnityInstance(canvas, config, (progress) => {
-        spinner.style.display = "none";
-        progressBarEmpty.style.display = "";
-        progressBarFull.style.width = `${100 * progress}%`;
-      }).then((unityInstance) => {
-        loadingCover.style.display = "none";
-        if (canFullscreen) {
-          if (!hideFullScreenButton) {
-            fullscreenButton.style.display = "";
-          }
-          fullscreenButton.onclick = () => {
-            unityInstance.SetFullscreen(1);
-          };
+
+      createUnityInstance(
+
+        canvas,
+
+        config,
+
+        (progress) => {
+
+          spinner.style.display = "none";
+
+          progressBarEmpty.style.display = "";
+
+          progressBarFull.style.width =
+            `${100 * progress}%`;
+
         }
-      }).catch((message) => {
-        alert(message);
-      });
+
+      )
+
+        .then((unityInstance) => {
+
+          /* Hide loading screen */
+
+          loadingCover.style.display = "none";
+
+
+          /* Fullscreen button */
+
+          if (canFullscreen) {
+
+            if (!hideFullScreenButton) {
+
+              fullscreenButton.style.display = "";
+
+            }
+
+            fullscreenButton.onclick = () => {
+
+              unityInstance.SetFullscreen(1);
+
+            };
+
+          }
+
+        })
+
+        .catch((message) => {
+
+          alert(message);
+
+        });
+
     };
+
+
     document.body.appendChild(script);
+
   </script>
+
 </body>
 
 </html>
