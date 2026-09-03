@@ -38,6 +38,35 @@ jobs:
           echo "=== Checking loader ==="
           head -c 200 Build/*.loader.js
 
+      - name: Verify deployed files are not LFS pointers
+        run: |
+          echo "=== Checking loader ==="
+          if grep -q "git-lfs.github.com/spec/v1" Build/*.loader.js; then
+            echo "ERROR: loader.js is still an LFS pointer!"
+            cat Build/*.loader.js
+            exit 1
+          else
+            echo "OK: loader.js is real JavaScript"
+          fi
+
+          echo ""
+          echo "=== Checking data file ==="
+          if grep -q "git-lfs.github.com/spec/v1" Build/*.data; then
+            echo "ERROR: data file is still an LFS pointer!"
+            exit 1
+          else
+            echo "OK: data file is real"
+          fi
+
+          echo ""
+          echo "=== Checking wasm ==="
+          if grep -q "git-lfs.github.com/spec/v1" Build/*.wasm; then
+            echo "ERROR: wasm is still an LFS pointer!"
+            exit 1
+          else
+            echo "OK: wasm is real"
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
