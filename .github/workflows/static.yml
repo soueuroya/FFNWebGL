@@ -1,0 +1,51 @@
+name: Deploy Unity WebGL to Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository with LFS
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Verify WebGL build
+        run: |
+          echo "=== Build files ==="
+          ls -lh Build/
+
+          echo ""
+          echo "=== Largest files ==="
+          du -h Build/* | sort -h
+
+          echo ""
+          echo "=== Checking loader ==="
+          head -c 200 Build/*.loader.js
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload WebGL build
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./Build
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
