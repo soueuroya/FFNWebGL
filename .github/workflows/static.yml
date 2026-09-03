@@ -41,10 +41,10 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload WebGL build
+      - name: Upload WebGL site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./Build
+          path: .
 
       - name: Deploy to GitHub Pages
         id: deployment
