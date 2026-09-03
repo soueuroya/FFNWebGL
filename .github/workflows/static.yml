@@ -21,56 +21,48 @@ jobs:
 
     steps:
       - name: Checkout repository with LFS
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           lfs: true
 
-      - name: Verify WebGL build
+      - name: Verify Unity WebGL files
         run: |
           echo "=== Build files ==="
           ls -lh Build/
 
           echo ""
-          echo "=== Largest files ==="
-          du -h Build/* | sort -h
+          echo "=== Loader ==="
+          head -c 100 Build/*.loader.js
+          echo ""
 
           echo ""
-          echo "=== Checking loader ==="
-          head -c 200 Build/*.loader.js
+          echo "=== Checking for LFS pointers ==="
 
-      - name: Verify deployed files are not LFS pointers
-        run: |
-          echo "=== Checking loader ==="
           if grep -q "git-lfs.github.com/spec/v1" Build/*.loader.js; then
-            echo "ERROR: loader.js is still an LFS pointer!"
-            cat Build/*.loader.js
+            echo "ERROR: loader.js is an LFS pointer!"
             exit 1
-          else
-            echo "OK: loader.js is real JavaScript"
           fi
 
-          echo ""
-          echo "=== Checking data file ==="
           if grep -q "git-lfs.github.com/spec/v1" Build/*.data; then
-            echo "ERROR: data file is still an LFS pointer!"
+            echo "ERROR: data file is an LFS pointer!"
             exit 1
-          else
-            echo "OK: data file is real"
           fi
 
-          echo ""
-          echo "=== Checking wasm ==="
           if grep -q "git-lfs.github.com/spec/v1" Build/*.wasm; then
-            echo "ERROR: wasm is still an LFS pointer!"
+            echo "ERROR: wasm file is an LFS pointer!"
             exit 1
-          else
-            echo "OK: wasm is real"
           fi
+
+          echo "All Unity WebGL files are real files."
+
+      - name: Disable Jekyll
+        run: |
+          touch .nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload WebGL site
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
